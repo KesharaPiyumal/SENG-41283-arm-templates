@@ -1,0 +1,3012 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sites_ysangularapp_name": {
+            "defaultValue": "ysangularapp",
+            "type": "String"
+        },
+        "profiles_cdn_profile_ys_name": {
+            "defaultValue": "cdn-profile-ys",
+            "type": "String"
+        },
+        "components_ysangularapp_name": {
+            "defaultValue": "ysangularapp",
+            "type": "String"
+        },
+        "sites_yoursketchwebappservice_name": {
+            "defaultValue": "yoursketchwebappservice",
+            "type": "String"
+        },
+        "frontdoors_frontdoorglobalys_name": {
+            "defaultValue": "frontdoorglobalys",
+            "type": "String"
+        },
+        "storageAccounts_storageaccys_name": {
+            "defaultValue": "storageaccys",
+            "type": "String"
+        },
+        "servers_yoursketchdbserver_name": {
+            "defaultValue": "yoursketchdbserver",
+            "type": "String"
+        },
+        "serverfarms_ASP_resourcegroup1_983c_name": {
+            "defaultValue": "ASP-resourcegroup1-983c",
+            "type": "String"
+        },
+        "components_yoursketchwebappservice_name": {
+            "defaultValue": "yoursketchwebappservice",
+            "type": "String"
+        },
+        "actionGroups_Application_Insights_Smart_Detection_name": {
+            "defaultValue": "Application Insights Smart Detection",
+            "type": "String"
+        },
+        "smartdetectoralertrules_failure_anomalies___ysangularapp_name": {
+            "defaultValue": "failure anomalies - ysangularapp",
+            "type": "String"
+        },
+        "smartdetectoralertrules_failure_anomalies___yoursketchapi_name": {
+            "defaultValue": "failure anomalies - yoursketchapi",
+            "type": "String"
+        },
+        "smartdetectoralertrules_failure_anomalies___azurekdxwebapi_name": {
+            "defaultValue": "failure anomalies - azurekdxwebapi",
+            "type": "String"
+        },
+        "smartdetectoralertrules_failure_anomalies___yoursketchwebappservice_name": {
+            "defaultValue": "failure anomalies - yoursketchwebappservice",
+            "type": "String"
+        },
+        "components_azurekdxwebapi_externalid": {
+            "defaultValue": "/subscriptions/46c209df-87fc-4ec7-ab1f-19b5b4337e23/resourceGroups/resource_group_1/providers/microsoft.insights/components/azurekdxwebapi",
+            "type": "String"
+        },
+        "components_yoursketchapi_externalid": {
+            "defaultValue": "/subscriptions/46c209df-87fc-4ec7-ab1f-19b5b4337e23/resourceGroups/resource_group_1/providers/microsoft.insights/components/yoursketchapi",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Cdn/profiles",
+            "apiVersion": "2020-04-15",
+            "name": "[parameters('profiles_cdn_profile_ys_name')]",
+            "location": "Global",
+            "sku": {
+                "name": "Standard_Microsoft"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers",
+            "apiVersion": "2017-12-01",
+            "name": "[parameters('servers_yoursketchdbserver_name')]",
+            "location": "eastus",
+            "sku": {
+                "name": "GP_Gen5_4",
+                "tier": "GeneralPurpose",
+                "family": "Gen5",
+                "capacity": 4
+            },
+            "properties": {
+                "storageProfile": {
+                    "storageMB": 102400,
+                    "backupRetentionDays": 7,
+                    "geoRedundantBackup": "Disabled",
+                    "storageAutogrow": "Disabled"
+                },
+                "version": "5.7",
+                "sslEnforcement": "Enabled",
+                "minimalTlsVersion": "TLSEnforcementDisabled",
+                "infrastructureEncryption": "Disabled",
+                "publicNetworkAccess": "Enabled"
+            }
+        },
+        {
+            "type": "microsoft.insights/actionGroups",
+            "apiVersion": "2019-03-01",
+            "name": "[parameters('actionGroups_Application_Insights_Smart_Detection_name')]",
+            "location": "Global",
+            "properties": {
+                "groupShortName": "SmartDetect",
+                "enabled": true,
+                "emailReceivers": [],
+                "smsReceivers": [],
+                "webhookReceivers": [],
+                "itsmReceivers": [],
+                "azureAppPushReceivers": [],
+                "automationRunbookReceivers": [],
+                "voiceReceivers": [],
+                "logicAppReceivers": [],
+                "azureFunctionReceivers": []
+            }
+        },
+        {
+            "type": "microsoft.insights/components",
+            "apiVersion": "2018-05-01-preview",
+            "name": "[parameters('components_yoursketchwebappservice_name')]",
+            "location": "southeastasia",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "RetentionInDays": 90,
+                "publicNetworkAccessForIngestion": "Enabled",
+                "publicNetworkAccessForQuery": "Enabled"
+            }
+        },
+        {
+            "type": "microsoft.insights/components",
+            "apiVersion": "2018-05-01-preview",
+            "name": "[parameters('components_ysangularapp_name')]",
+            "location": "southeastasia",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "RetentionInDays": 90,
+                "publicNetworkAccessForIngestion": "Enabled",
+                "publicNetworkAccessForQuery": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/frontdoors",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('frontdoors_frontdoorglobalys_name')]",
+            "location": "Global",
+            "properties": {
+                "resourceState": "Enabled",
+                "backendPools": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_frontdoorglobalys_name')), '/BackendPools/mybackendpool')]",
+                        "name": "mybackendpool",
+                        "properties": {
+                            "backends": [
+                                {
+                                    "address": "ysangularapp.azurewebsites.net",
+                                    "httpPort": 80,
+                                    "httpsPort": 443,
+                                    "priority": 1,
+                                    "weight": 50,
+                                    "backendHostHeader": "ysangularapp.azurewebsites.net",
+                                    "enabledState": "Enabled"
+                                }
+                            ],
+                            "healthProbeSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_frontdoorglobalys_name')), '/healthProbeSettings/healthProbeSettings-1597047690965')]"
+                            },
+                            "loadBalancingSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_frontdoorglobalys_name')), '/loadBalancingSettings/loadBalancingSettings-1597047690965')]"
+                            },
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "healthProbeSettings": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_frontdoorglobalys_name')), '/HealthProbeSettings/healthProbeSettings-1597047690965')]",
+                        "name": "healthProbeSettings-1597047690965",
+                        "properties": {
+                            "intervalInSeconds": 30,
+                            "path": "/",
+                            "protocol": "Https",
+                            "resourceState": "Enabled",
+                            "enabledState": "Enabled",
+                            "healthProbeMethod": "Head"
+                        }
+                    }
+                ],
+                "frontendEndpoints": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_frontdoorglobalys_name')), concat('/FrontendEndpoints/', parameters('frontdoors_frontdoorglobalys_name'), '-azurefd-net'))]",
+                        "name": "[concat(parameters('frontdoors_frontdoorglobalys_name'), '-azurefd-net')]",
+                        "properties": {
+                            "hostName": "[concat(parameters('frontdoors_frontdoorglobalys_name'), '.azurefd.net')]",
+                            "sessionAffinityEnabledState": "Disabled",
+                            "sessionAffinityTtlSeconds": 0,
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "loadBalancingSettings": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_frontdoorglobalys_name')), '/LoadBalancingSettings/loadBalancingSettings-1597047690965')]",
+                        "name": "loadBalancingSettings-1597047690965",
+                        "properties": {
+                            "additionalLatencyMilliseconds": 0,
+                            "sampleSize": 4,
+                            "successfulSamplesRequired": 2,
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "routingRules": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_frontdoorglobalys_name')), '/RoutingRules/locationRule')]",
+                        "name": "locationRule",
+                        "properties": {
+                            "frontendEndpoints": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_frontdoorglobalys_name')), concat('/frontendEndpoints/', parameters('frontdoors_frontdoorglobalys_name'), '-azurefd-net'))]"
+                                }
+                            ],
+                            "acceptedProtocols": [
+                                "Http",
+                                "Https"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "enabledState": "Enabled",
+                            "resourceState": "Enabled",
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "forwardingProtocol": "HttpsOnly",
+                                "backendPool": {
+                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoors_frontdoorglobalys_name')), '/backendPools/mybackendpool')]"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "backendPoolsSettings": {
+                    "enforceCertificateNameCheck": "Enabled",
+                    "sendRecvTimeoutSeconds": 30
+                },
+                "enabledState": "Enabled",
+                "friendlyName": "[parameters('frontdoors_frontdoorglobalys_name')]"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('storageAccounts_storageaccys_name')]",
+            "location": "southeastasia",
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[parameters('serverfarms_ASP_resourcegroup1_983c_name')]",
+            "location": "Southeast Asia",
+            "sku": {
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 1
+            },
+            "kind": "app",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "microsoft.alertsmanagement/smartdetectoralertrules",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('smartdetectoralertrules_failure_anomalies___azurekdxwebapi_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_Application_Insights_Smart_Detection_name'))]"
+            ],
+            "properties": {
+                "description": "Failure Anomalies notifies you of an unusual rise in the rate of failed HTTP requests or dependency calls.",
+                "state": "Enabled",
+                "severity": "Sev3",
+                "frequency": "PT1M",
+                "detector": {
+                    "id": "FailureAnomaliesDetector",
+                    "name": "Failure Anomalies",
+                    "description": "Detects if your application experiences an abnormal rise in the rate of HTTP requests or dependency calls that are reported as failed. The anomaly detection uses machine learning algorithms and occurs in near real time, therefore there's no need to define a frequency for this signal.<br/></br/>To help you triage and diagnose the problem, an analysis of the characteristics of the failures and related telemetry is provided with the detection. This feature works for any app, hosted in the cloud or on your own servers, that generates request or dependency telemetry - for example, if you have a worker role that calls <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackrequest\\\" target=\\\"_blank\\\">TrackRequest()</a> or <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackdependency\\\" target=\\\"_blank\\\">TrackDependency()</a>.<br/><br/><a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/azure-monitor/app/proactive-failure-diagnostics\\\" target=\\\"_blank\\\">Learn more about Failure Anomalies</a>",
+                    "supportedResourceTypes": [
+                        "ApplicationInsights"
+                    ]
+                },
+                "scope": [
+                    "[parameters('components_azurekdxwebapi_externalid')]"
+                ],
+                "actionGroups": {
+                    "groupIds": [
+                        "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_Application_Insights_Smart_Detection_name'))]"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "microsoft.alertsmanagement/smartdetectoralertrules",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('smartdetectoralertrules_failure_anomalies___yoursketchapi_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_Application_Insights_Smart_Detection_name'))]"
+            ],
+            "properties": {
+                "description": "Failure Anomalies notifies you of an unusual rise in the rate of failed HTTP requests or dependency calls.",
+                "state": "Enabled",
+                "severity": "Sev3",
+                "frequency": "PT1M",
+                "detector": {
+                    "id": "FailureAnomaliesDetector",
+                    "name": "Failure Anomalies",
+                    "description": "Detects if your application experiences an abnormal rise in the rate of HTTP requests or dependency calls that are reported as failed. The anomaly detection uses machine learning algorithms and occurs in near real time, therefore there's no need to define a frequency for this signal.<br/></br/>To help you triage and diagnose the problem, an analysis of the characteristics of the failures and related telemetry is provided with the detection. This feature works for any app, hosted in the cloud or on your own servers, that generates request or dependency telemetry - for example, if you have a worker role that calls <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackrequest\\\" target=\\\"_blank\\\">TrackRequest()</a> or <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackdependency\\\" target=\\\"_blank\\\">TrackDependency()</a>.<br/><br/><a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/azure-monitor/app/proactive-failure-diagnostics\\\" target=\\\"_blank\\\">Learn more about Failure Anomalies</a>",
+                    "supportedResourceTypes": [
+                        "ApplicationInsights"
+                    ]
+                },
+                "scope": [
+                    "[parameters('components_yoursketchapi_externalid')]"
+                ],
+                "actionGroups": {
+                    "groupIds": [
+                        "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_Application_Insights_Smart_Detection_name'))]"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/endpoints",
+            "apiVersion": "2020-04-15",
+            "name": "[concat(parameters('profiles_cdn_profile_ys_name'), '/yoursketch')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_cdn_profile_ys_name'))]"
+            ],
+            "properties": {
+                "originHostHeader": "www.frontdoorglobalys.azurefd.net",
+                "isHttpAllowed": true,
+                "isHttpsAllowed": true,
+                "queryStringCachingBehavior": "IgnoreQueryString",
+                "origins": [
+                    {
+                        "name": "www-frontdoorglobalys-azurefd-net",
+                        "properties": {
+                            "hostName": "www.frontdoorglobalys.azurefd.net",
+                            "originHostHeader": "www.frontdoorglobalys.azurefd.net",
+                            "priority": 1,
+                            "weight": 1000,
+                            "enabled": true
+                        }
+                    }
+                ],
+                "originGroups": [],
+                "contentTypesToCompress": [
+                    "application/eot",
+                    "application/font",
+                    "application/font-sfnt",
+                    "application/javascript",
+                    "application/json",
+                    "application/opentype",
+                    "application/otf",
+                    "application/pkcs7-mime",
+                    "application/truetype",
+                    "application/ttf",
+                    "application/vnd.ms-fontobject",
+                    "application/xhtml+xml",
+                    "application/xml",
+                    "application/xml+rss",
+                    "application/x-font-opentype",
+                    "application/x-font-truetype",
+                    "application/x-font-ttf",
+                    "application/x-httpd-cgi",
+                    "application/x-javascript",
+                    "application/x-mpegurl",
+                    "application/x-opentype",
+                    "application/x-otf",
+                    "application/x-perl",
+                    "application/x-ttf",
+                    "font/eot",
+                    "font/ttf",
+                    "font/otf",
+                    "font/opentype",
+                    "image/svg+xml",
+                    "text/css",
+                    "text/csv",
+                    "text/html",
+                    "text/javascript",
+                    "text/js",
+                    "text/plain",
+                    "text/richtext",
+                    "text/tab-separated-values",
+                    "text/xml",
+                    "text/x-script",
+                    "text/x-component",
+                    "text/x-java-source"
+                ],
+                "isCompressionEnabled": true,
+                "optimizationType": "GeneralWebDelivery",
+                "geoFilters": [],
+                "urlSigningKeys": []
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/audit_log_enabled')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/audit_log_events')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "CONNECTION",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/audit_log_exclude_users')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "azure_superuser",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/audit_log_include_users')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/binlog_expire_logs_seconds')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/binlog_group_commit_sync_delay')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/binlog_group_commit_sync_no_delay_count')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/binlog_row_image')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "minimal",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/binlog_sum_size_for_stop_pct_max')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "30",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/character_set_server')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "latin1",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/collation_server')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "latin1_swedish_ci",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/default_week_format')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/div_precision_increment')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/eq_range_index_dive_limit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "200",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/event_scheduler')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/flush_time')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/ft_query_expansion_limit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "20",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/group_concat_max_len')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1024",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/init_connect')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_adaptive_flushing')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_adaptive_flushing_lwm')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "10",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_adaptive_hash_index')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_adaptive_hash_index_parts')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "8",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_adaptive_max_sleep_delay')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "150000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_autoextend_increment')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "64",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_autoinc_lock_mode')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_buffer_pool_dump_pct')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "25",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_buffer_pool_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "16106127360",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_change_buffer_max_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "25",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_change_buffering')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "all",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_cmp_per_index_enabled')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_commit_concurrency')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_compression_failure_threshold_pct')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "5",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_compression_level')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "6",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_compression_pad_pct_max')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "50",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_concurrency_tickets')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "5000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_deadlock_detect')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_default_row_format')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "DYNAMIC",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_file_format')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "Barracuda",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_file_per_table')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_fill_factor')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "100",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_ft_cache_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "8000000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_ft_enable_stopword')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_ft_max_token_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "84",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_ft_min_token_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "3",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_ft_num_word_optimize')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "2000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_ft_result_cache_limit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "2000000000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_ft_sort_pll_degree')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "2",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_ft_total_cache_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "640000000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_io_capacity')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "200",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_io_capacity_max')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "2000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_large_prefix')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_lock_wait_timeout')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "50",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_log_compressed_pages')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_lru_scan_depth')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1024",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_max_dirty_pages_pct')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "75",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_max_dirty_pages_pct_lwm')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_max_purge_lag')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_max_purge_lag_delay')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_old_blocks_pct')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "37",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_old_blocks_time')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_online_alter_log_max_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "134217728",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_optimize_fulltext_only')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_page_cleaners')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_purge_batch_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "300",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_purge_rseg_truncate_frequency')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "128",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_purge_threads')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_random_read_ahead')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_read_ahead_threshold')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "56",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_read_io_threads')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_rollback_segments')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "128",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_stats_auto_recalc')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_stats_include_delete_marked')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_stats_method')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "nulls_equal",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_stats_on_metadata')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_stats_persistent')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_stats_persistent_sample_pages')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "20",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_stats_transient_sample_pages')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "8",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_sync_array_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_table_locks')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_thread_concurrency')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_thread_sleep_delay')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "10000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/innodb_write_io_threads')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/interactive_timeout')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "28800",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/join_buffer_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "262144",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/local_infile')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/lock_wait_timeout')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "31536000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/log_bin_trust_function_creators')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/log_output')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "FILE",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/log_queries_not_using_indexes')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/log_slow_admin_statements')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/log_slow_slave_statements')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/log_throttle_queries_not_using_indexes')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/long_query_time')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "10",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/lower_case_table_names')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_allowed_packet')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "536870912",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_connect_errors')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "100",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_connections')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "625",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_digest_length')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1024",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_error_count')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "64",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_execution_time')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_heap_table_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "16777216",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_join_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "18446744073709551615",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_length_for_sort_data')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1024",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_points_in_geometry')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "65536",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_prepared_stmt_count')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "16382",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_seeks_for_key')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4294967295",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_sort_length')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1024",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_sp_recursion_depth')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_user_connections')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/max_write_lock_count')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4294967295",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/min_examined_row_limit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/net_buffer_length')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "16384",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/net_read_timeout')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "120",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/net_retry_count')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "10",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/net_write_timeout')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "240",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/ngram_token_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "2",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/optimizer_prune_level')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/optimizer_search_depth')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "62",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/optimizer_switch')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "default",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/parser_max_mem_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "18446744073709551615",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/performance_schema')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/preload_buffer_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "32768",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_cache_limit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1048576",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_cache_min_res_unit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4096",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_cache_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_cache_type')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_prealloc_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "8192",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_store_capture_interval')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "15",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_store_capture_mode')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "NONE",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_store_capture_utility_queries')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "NO",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_store_retention_period_in_days')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "7",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_store_wait_sampling_capture_mode')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "NONE",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/query_store_wait_sampling_frequency')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "30",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/range_alloc_block_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4096",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/range_optimizer_max_mem_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "8388608",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/read_only')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/redirect_enabled')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/relay_log_space_limit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1073741824",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/replicate_wild_ignore_table')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "mysql.%",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/server_id')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1002017735",
+                "source": "user-override"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/session_track_schema')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "ON",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/session_track_state_change')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/show_compatibility_56')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/skip_show_database')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/slave_net_timeout')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "60",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/slow_query_log')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "OFF",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/sort_buffer_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "524288",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/sql_mode')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/stored_program_cache')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "256",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/table_definition_cache')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "5000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/table_open_cache')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "5000",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/table_open_cache_instances')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/thread_cache_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "14",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/thread_handling')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "one-thread-per-connection",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/thread_pool_batch_max_time')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/thread_pool_batch_wait_timeout')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "0",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/thread_pool_max_threads')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "65535",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/thread_pool_min_threads')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "1",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/time_zone')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "SYSTEM",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/tmp_table_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "16777216",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/transaction_alloc_block_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "8192",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/transaction_prealloc_size')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "4096",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/tx_isolation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "REPEATABLE-READ",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/updatable_views_with_limit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "YES",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/configurations",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/wait_timeout')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "value": "120",
+                "source": "system-default"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/databases",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/information_schema')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "charset": "utf8",
+                "collation": "utf8_general_ci"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/databases",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/mysql')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "charset": "latin1",
+                "collation": "latin1_swedish_ci"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/databases",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/performance_schema')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "charset": "utf8",
+                "collation": "utf8_general_ci"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/databases",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/sys')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "charset": "utf8",
+                "collation": "utf8_general_ci"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/databases",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/yoursketch_db')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "charset": "latin1",
+                "collation": "latin1_swedish_ci"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/firewallRules",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/AllowAll_2020-8-9_11-45-1')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "255.255.255.255"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/firewallRules",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/ClientIPAddress_2020-8-9_11-44-56')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "startIpAddress": "175.157.46.80",
+                "endIpAddress": "175.157.46.80"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/securityAlertPolicies",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('servers_yoursketchdbserver_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('servers_yoursketchdbserver_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccys_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccys_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccys_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccys_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('sites_yoursketchwebappservice_name')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_resourcegroup1_983c_name'))]"
+            ],
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('sites_yoursketchwebappservice_name'), '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(parameters('sites_yoursketchwebappservice_name'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_resourcegroup1_983c_name'))]",
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "siteConfig": {},
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false,
+                "redundancyMode": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('sites_ysangularapp_name')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_resourcegroup1_983c_name'))]"
+            ],
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('sites_ysangularapp_name'), '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(parameters('sites_ysangularapp_name'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_resourcegroup1_983c_name'))]",
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "siteConfig": {},
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false,
+                "redundancyMode": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_yoursketchwebappservice_name'), '/web')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_yoursketchwebappservice_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "nodeVersion": "12.13.0",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$yoursketchwebappservice",
+                "azureStorageAccounts": {},
+                "scmType": "None",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": true,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": true
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_ysangularapp_name'), '/web')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_ysangularapp_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "nodeVersion": "12.13.0",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$ysangularapp",
+                "azureStorageAccounts": {},
+                "scmType": "VSTSRM",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": true,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": true
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_yoursketchwebappservice_name'), '/235f084b7c6d42288d4b69ada90a4762')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_yoursketchwebappservice_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "VS Code",
+                "deployer": "ZipDeploy",
+                "message": "Created via a push deployment",
+                "start_time": "2020-08-09T09:31:24.5326703Z",
+                "end_time": "2020-08-09T09:32:29.3653576Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_ysangularapp_name'), '/3025d3e72d7440f4afd647cd357373f5')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_ysangularapp_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "VSTS",
+                "message": "{\"type\":\"deployment\",\"commitId\":\"b55a36c605822c95dcd98d15c82ee7bf7e5a7fa8\",\"buildId\":\"11\",\"releaseId\":\"1\",\"buildNumber\":\"11\",\"releaseName\":\"Release-1\",\"repoProvider\":\"Git\",\"collectionUrl\":\"https://dev.azure.com/samarathungasmkp/\",\"teamProject\":\"2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"buildProjectUrl\":\"https://dev.azure.com/samarathungasmkp/2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"repositoryUrl\":\"\",\"branch\":\"master\",\"teamProjectName\":\"ClientAppYS\",\"slotName\":\"production\"}",
+                "start_time": "2020-08-09T22:13:14.0858634Z",
+                "end_time": "2020-08-09T22:13:14.6171302Z",
+                "active": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_ysangularapp_name'), '/a613f48d88af407bbd5a73032bcb2b7b')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_ysangularapp_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "VSTS",
+                "message": "{\"type\":\"deployment\",\"commitId\":\"b55a36c605822c95dcd98d15c82ee7bf7e5a7fa8\",\"buildId\":\"7\",\"buildNumber\":\"7\",\"repoProvider\":\"Git\",\"repoName\":\"repository\",\"collectionUrl\":\"https://dev.azure.com/samarathungasmkp/\",\"teamProject\":\"2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"buildProjectUrl\":\"https://dev.azure.com/samarathungasmkp/2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"repositoryUrl\":\"https://github.com/KesharaPiyumal/AngularAzureRepo.git\",\"branch\":\"master\",\"teamProjectName\":\"ClientAppYS\",\"slotName\":\"production\"}",
+                "start_time": "2020-08-09T21:02:09.7297599Z",
+                "end_time": "2020-08-09T21:02:10.1985254Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_yoursketchwebappservice_name'), '/d40bb264b56b4928b0677334a37dbdb8')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_yoursketchwebappservice_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "VS Code",
+                "deployer": "ZipDeploy",
+                "message": "Created via a push deployment",
+                "start_time": "2020-08-09T09:07:55.5289946Z",
+                "end_time": "2020-08-09T09:10:35.6641272Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_yoursketchwebappservice_name'), '/fcb619cfdb834ba0b730a57465107a70')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_yoursketchwebappservice_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "VS Code",
+                "deployer": "ZipDeploy",
+                "message": "Created via a push deployment",
+                "start_time": "2020-08-09T09:53:39.1916142Z",
+                "end_time": "2020-08-09T09:56:08.8087029Z",
+                "active": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_yoursketchwebappservice_name'), '/', parameters('sites_yoursketchwebappservice_name'), '.azurewebsites.net')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_yoursketchwebappservice_name'))]"
+            ],
+            "properties": {
+                "siteName": "yoursketchwebappservice",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_ysangularapp_name'), '/', parameters('sites_ysangularapp_name'), '.azurewebsites.net')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_ysangularapp_name'))]"
+            ],
+            "properties": {
+                "siteName": "ysangularapp",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "microsoft.alertsmanagement/smartdetectoralertrules",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('smartdetectoralertrules_failure_anomalies___yoursketchwebappservice_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('microsoft.insights/components', parameters('components_yoursketchwebappservice_name'))]",
+                "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_Application_Insights_Smart_Detection_name'))]"
+            ],
+            "properties": {
+                "description": "Failure Anomalies notifies you of an unusual rise in the rate of failed HTTP requests or dependency calls.",
+                "state": "Enabled",
+                "severity": "Sev3",
+                "frequency": "PT1M",
+                "detector": {
+                    "id": "FailureAnomaliesDetector",
+                    "name": "Failure Anomalies",
+                    "description": "Detects if your application experiences an abnormal rise in the rate of HTTP requests or dependency calls that are reported as failed. The anomaly detection uses machine learning algorithms and occurs in near real time, therefore there's no need to define a frequency for this signal.<br/></br/>To help you triage and diagnose the problem, an analysis of the characteristics of the failures and related telemetry is provided with the detection. This feature works for any app, hosted in the cloud or on your own servers, that generates request or dependency telemetry - for example, if you have a worker role that calls <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackrequest\\\" target=\\\"_blank\\\">TrackRequest()</a> or <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackdependency\\\" target=\\\"_blank\\\">TrackDependency()</a>.<br/><br/><a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/azure-monitor/app/proactive-failure-diagnostics\\\" target=\\\"_blank\\\">Learn more about Failure Anomalies</a>",
+                    "supportedResourceTypes": [
+                        "ApplicationInsights"
+                    ]
+                },
+                "scope": [
+                    "[resourceId('microsoft.insights/components', parameters('components_yoursketchwebappservice_name'))]"
+                ],
+                "actionGroups": {
+                    "groupIds": [
+                        "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_Application_Insights_Smart_Detection_name'))]"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "microsoft.alertsmanagement/smartdetectoralertrules",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('smartdetectoralertrules_failure_anomalies___ysangularapp_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('microsoft.insights/components', parameters('components_ysangularapp_name'))]",
+                "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_Application_Insights_Smart_Detection_name'))]"
+            ],
+            "properties": {
+                "description": "Failure Anomalies notifies you of an unusual rise in the rate of failed HTTP requests or dependency calls.",
+                "state": "Enabled",
+                "severity": "Sev3",
+                "frequency": "PT1M",
+                "detector": {
+                    "id": "FailureAnomaliesDetector",
+                    "name": "Failure Anomalies",
+                    "description": "Detects if your application experiences an abnormal rise in the rate of HTTP requests or dependency calls that are reported as failed. The anomaly detection uses machine learning algorithms and occurs in near real time, therefore there's no need to define a frequency for this signal.<br/></br/>To help you triage and diagnose the problem, an analysis of the characteristics of the failures and related telemetry is provided with the detection. This feature works for any app, hosted in the cloud or on your own servers, that generates request or dependency telemetry - for example, if you have a worker role that calls <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackrequest\\\" target=\\\"_blank\\\">TrackRequest()</a> or <a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/application-insights/app-insights-api-custom-events-metrics#trackdependency\\\" target=\\\"_blank\\\">TrackDependency()</a>.<br/><br/><a class=\"ext-smartDetecor-link\" href=\\\"https://docs.microsoft.com/azure/azure-monitor/app/proactive-failure-diagnostics\\\" target=\\\"_blank\\\">Learn more about Failure Anomalies</a>",
+                    "supportedResourceTypes": [
+                        "ApplicationInsights"
+                    ]
+                },
+                "scope": [
+                    "[resourceId('microsoft.insights/components', parameters('components_ysangularapp_name'))]"
+                ],
+                "actionGroups": {
+                    "groupIds": [
+                        "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_Application_Insights_Smart_Detection_name'))]"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/endpoints/origins",
+            "apiVersion": "2020-04-15",
+            "name": "[concat(parameters('profiles_cdn_profile_ys_name'), '/yoursketch/www-frontdoorglobalys-azurefd-net')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/endpoints', parameters('profiles_cdn_profile_ys_name'), 'yoursketch')]",
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_cdn_profile_ys_name'))]"
+            ],
+            "properties": {
+                "hostName": "www.frontdoorglobalys.azurefd.net",
+                "enabled": true,
+                "priority": 1,
+                "weight": 1000,
+                "originHostHeader": "www.frontdoorglobalys.azurefd.net"
+            }
+        }
+    ]
+}

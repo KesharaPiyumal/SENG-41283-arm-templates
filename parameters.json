@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sites_ysangularapp_name": {
+            "value": null
+        },
+        "profiles_cdn_profile_ys_name": {
+            "value": null
+        },
+        "components_ysangularapp_name": {
+            "value": null
+        },
+        "sites_yoursketchwebappservice_name": {
+            "value": null
+        },
+        "frontdoors_frontdoorglobalys_name": {
+            "value": null
+        },
+        "storageAccounts_storageaccys_name": {
+            "value": null
+        },
+        "servers_yoursketchdbserver_name": {
+            "value": null
+        },
+        "serverfarms_ASP_resourcegroup1_983c_name": {
+            "value": null
+        },
+        "components_yoursketchwebappservice_name": {
+            "value": null
+        },
+        "actionGroups_Application_Insights_Smart_Detection_name": {
+            "value": null
+        },
+        "smartdetectoralertrules_failure_anomalies___ysangularapp_name": {
+            "value": null
+        },
+        "smartdetectoralertrules_failure_anomalies___yoursketchapi_name": {
+            "value": null
+        },
+        "smartdetectoralertrules_failure_anomalies___azurekdxwebapi_name": {
+            "value": null
+        },
+        "smartdetectoralertrules_failure_anomalies___yoursketchwebappservice_name": {
+            "value": null
+        },
+        "components_azurekdxwebapi_externalid": {
+            "value": null
+        },
+        "components_yoursketchapi_externalid": {
+            "value": null
+        }
+    }
+}
