@@ -2,6 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "sites_appYsFunc_name": {
+            "defaultValue": "appYsFunc",
+            "type": "String"
+        },
         "sites_ysangularapp_name": {
             "defaultValue": "ysangularapp",
             "type": "String"
@@ -30,12 +34,20 @@
             "defaultValue": "yoursketchdbserver",
             "type": "String"
         },
+        "serverfarms_ASP_resourcegroup1_8552_name": {
+            "defaultValue": "ASP-resourcegroup1-8552",
+            "type": "String"
+        },
         "serverfarms_ASP_resourcegroup1_983c_name": {
             "defaultValue": "ASP-resourcegroup1-983c",
             "type": "String"
         },
         "components_yoursketchwebappservice_name": {
             "defaultValue": "yoursketchwebappservice",
+            "type": "String"
+        },
+        "storageAccounts_storageaccountresoub050_name": {
+            "defaultValue": "storageaccountresoub050",
             "type": "String"
         },
         "actionGroups_Application_Insights_Smart_Detection_name": {
@@ -262,6 +274,39 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
+            "name": "[parameters('storageAccounts_storageaccountresoub050_name')]",
+            "location": "southeastasia",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage",
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
             "name": "[parameters('storageAccounts_storageaccys_name')]",
             "location": "southeastasia",
             "sku": {
@@ -291,6 +336,30 @@
                     "keySource": "Microsoft.Storage"
                 },
                 "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[parameters('serverfarms_ASP_resourcegroup1_8552_name')]",
+            "location": "Southeast Asia",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "functionapp",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
             }
         },
         {
@@ -2549,6 +2618,26 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountresoub050_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountresoub050_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccounts_storageaccys_name'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccys_name'))]"
@@ -2569,6 +2658,23 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices",
             "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountresoub050_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountresoub050_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccounts_storageaccys_name'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccys_name'))]"
@@ -2581,6 +2687,44 @@
                 "cors": {
                     "corsRules": []
                 }
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('sites_appYsFunc_name')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_resourcegroup1_8552_name'))]"
+            ],
+            "kind": "functionapp",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "appysfunc.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "appysfunc.scm.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_resourcegroup1_8552_name'))]",
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "siteConfig": {},
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 1536,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false,
+                "redundancyMode": "None"
             }
         },
         {
@@ -2657,6 +2801,87 @@
                 "dailyMemoryTimeQuota": 0,
                 "httpsOnly": false,
                 "redundancyMode": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_appYsFunc_name'), '/web')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_appYsFunc_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": -1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$appYsFunc",
+                "azureStorageAccounts": {},
+                "scmType": "None",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "cors": {
+                    "allowedOrigins": [
+                        "https://functions.azure.com",
+                        "https://functions-staging.azure.com",
+                        "https://functions-next.azure.com"
+                    ],
+                    "supportCredentials": false
+                },
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
             }
         },
         {
@@ -2810,6 +3035,82 @@
         {
             "type": "Microsoft.Web/sites/deployments",
             "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_ysangularapp_name'), '/002eb443eb6f4b3f88f0ebc44f583579')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_ysangularapp_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "VSTS",
+                "message": "{\"type\":\"deployment\",\"commitId\":\"afba367c5679108fb91267a0804430cb18ff7215\",\"buildId\":\"16\",\"releaseId\":\"2\",\"buildNumber\":\"16\",\"releaseName\":\"Release-2\",\"repoProvider\":\"GitHub\",\"repoName\":\"KesharaPiyumal/AngularAzureRepo\",\"collectionUrl\":\"https://dev.azure.com/samarathungasmkp/\",\"teamProject\":\"26e61b8b-2f19-4928-9fa1-beef6a61b3a4\",\"buildProjectUrl\":\"https://dev.azure.com/samarathungasmkp/26e61b8b-2f19-4928-9fa1-beef6a61b3a4\",\"repositoryUrl\":\"\",\"branch\":\"master\",\"teamProjectName\":\"Latest YS Client\",\"slotName\":\"production\"}",
+                "start_time": "2020-08-11T10:19:22.8852323Z",
+                "end_time": "2020-08-11T10:19:23.4477479Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_ysangularapp_name'), '/029dc14ef77040e2baa84db30e30245a')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_ysangularapp_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "VSTS",
+                "message": "{\"type\":\"deployment\",\"commitId\":\"3df679eb79e1115c13709541e87769d8c38b92d3\",\"buildId\":\"15\",\"releaseId\":\"1\",\"buildNumber\":\"15\",\"releaseName\":\"Release-1\",\"repoProvider\":\"GitHub\",\"repoName\":\"KesharaPiyumal/AngularAzureRepo\",\"collectionUrl\":\"https://dev.azure.com/samarathungasmkp/\",\"teamProject\":\"26e61b8b-2f19-4928-9fa1-beef6a61b3a4\",\"buildProjectUrl\":\"https://dev.azure.com/samarathungasmkp/26e61b8b-2f19-4928-9fa1-beef6a61b3a4\",\"repositoryUrl\":\"\",\"branch\":\"master\",\"teamProjectName\":\"Latest YS Client\",\"slotName\":\"production\"}",
+                "start_time": "2020-08-10T11:45:40.855468Z",
+                "end_time": "2020-08-10T11:45:41.2617299Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_ysangularapp_name'), '/08aa33c5fd084b3581ab68263500c039')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_ysangularapp_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "VSTS",
+                "message": "{\"type\":\"deployment\",\"commitId\":\"a0ba03f0d1325b67d5d44d4e9779d8c3bc460f24\",\"buildId\":\"17\",\"releaseId\":\"3\",\"buildNumber\":\"17\",\"releaseName\":\"Release-3\",\"repoProvider\":\"GitHub\",\"repoName\":\"KesharaPiyumal/AngularAzureRepo\",\"collectionUrl\":\"https://dev.azure.com/samarathungasmkp/\",\"teamProject\":\"26e61b8b-2f19-4928-9fa1-beef6a61b3a4\",\"buildProjectUrl\":\"https://dev.azure.com/samarathungasmkp/26e61b8b-2f19-4928-9fa1-beef6a61b3a4\",\"repositoryUrl\":\"\",\"branch\":\"master\",\"teamProjectName\":\"Latest YS Client\",\"slotName\":\"production\"}",
+                "start_time": "2020-08-11T13:50:37.9038621Z",
+                "end_time": "2020-08-11T13:50:38.5015916Z",
+                "active": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_ysangularapp_name'), '/1589e6a4c3e34b40971d3776a6179c11')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_ysangularapp_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "VSTS",
+                "message": "{\"type\":\"deployment\",\"commitId\":\"3df679eb79e1115c13709541e87769d8c38b92d3\",\"buildId\":\"14\",\"buildNumber\":\"14\",\"repoProvider\":\"Git\",\"repoName\":\"repository\",\"collectionUrl\":\"https://dev.azure.com/samarathungasmkp/\",\"teamProject\":\"2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"buildProjectUrl\":\"https://dev.azure.com/samarathungasmkp/2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"repositoryUrl\":\"https://github.com/KesharaPiyumal/AngularAzureRepo.git\",\"branch\":\"master\",\"teamProjectName\":\"ClientAppYS\",\"slotName\":\"production\"}",
+                "start_time": "2020-08-10T11:14:11.3597531Z",
+                "end_time": "2020-08-10T11:14:11.969148Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
             "name": "[concat(parameters('sites_yoursketchwebappservice_name'), '/235f084b7c6d42288d4b69ada90a4762')]",
             "location": "Southeast Asia",
             "dependsOn": [
@@ -2842,7 +3143,7 @@
                 "message": "{\"type\":\"deployment\",\"commitId\":\"b55a36c605822c95dcd98d15c82ee7bf7e5a7fa8\",\"buildId\":\"11\",\"releaseId\":\"1\",\"buildNumber\":\"11\",\"releaseName\":\"Release-1\",\"repoProvider\":\"Git\",\"collectionUrl\":\"https://dev.azure.com/samarathungasmkp/\",\"teamProject\":\"2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"buildProjectUrl\":\"https://dev.azure.com/samarathungasmkp/2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"repositoryUrl\":\"\",\"branch\":\"master\",\"teamProjectName\":\"ClientAppYS\",\"slotName\":\"production\"}",
                 "start_time": "2020-08-09T22:13:14.0858634Z",
                 "end_time": "2020-08-09T22:13:14.6171302Z",
-                "active": true
+                "active": false
             }
         },
         {
@@ -2886,6 +3187,25 @@
         {
             "type": "Microsoft.Web/sites/deployments",
             "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_ysangularapp_name'), '/ebb02605fbe64b4b8970a65ccefae101')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_ysangularapp_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "VSTS",
+                "message": "{\"type\":\"deployment\",\"commitId\":\"3df679eb79e1115c13709541e87769d8c38b92d3\",\"buildId\":\"13\",\"releaseId\":\"2\",\"buildNumber\":\"13\",\"releaseName\":\"Release-2\",\"repoProvider\":\"Git\",\"collectionUrl\":\"https://dev.azure.com/samarathungasmkp/\",\"teamProject\":\"2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"buildProjectUrl\":\"https://dev.azure.com/samarathungasmkp/2a808b14-aa83-4a11-a2b8-a4b3995cf720\",\"repositoryUrl\":\"\",\"branch\":\"master\",\"teamProjectName\":\"ClientAppYS\",\"slotName\":\"production\"}",
+                "start_time": "2020-08-10T10:53:56.4442926Z",
+                "end_time": "2020-08-10T10:53:57.0224004Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
             "name": "[concat(parameters('sites_yoursketchwebappservice_name'), '/fcb619cfdb834ba0b730a57465107a70')]",
             "location": "Southeast Asia",
             "dependsOn": [
@@ -2900,6 +3220,36 @@
                 "start_time": "2020-08-09T09:53:39.1916142Z",
                 "end_time": "2020-08-09T09:56:08.8087029Z",
                 "active": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_appYsFunc_name'), '/uploadFile')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_appYsFunc_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://appysfunc.azurewebsites.net/admin/vfs/site/wwwroot/uploadFile/",
+                "script_href": "https://appysfunc.azurewebsites.net/admin/vfs/site/wwwroot/uploadFile/index.js",
+                "config_href": "https://appysfunc.azurewebsites.net/admin/vfs/site/wwwroot/uploadFile/function.json",
+                "href": "https://appysfunc.azurewebsites.net/admin/functions/uploadFile",
+                "config": {},
+                "test_data": "{\"method\":\"post\",\"queryStringParams\":[],\"headers\":[],\"body\":{\"name\":\"Azure\"}}"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_appYsFunc_name'), '/', parameters('sites_appYsFunc_name'), '.azurewebsites.net')]",
+            "location": "Southeast Asia",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_appYsFunc_name'))]"
+            ],
+            "properties": {
+                "siteName": "appYsFunc",
+                "hostNameType": "Verified"
             }
         },
         {
@@ -3006,6 +3356,54 @@
                 "priority": 1,
                 "weight": 1000,
                 "originHostHeader": "www.frontdoorglobalys.azurefd.net"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountresoub050_name'), '/default/azure-webjobs-hosts')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccountresoub050_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountresoub050_name'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountresoub050_name'), '/default/azure-webjobs-secrets')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccountresoub050_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountresoub050_name'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccys_name'), '/default/containerys')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccys_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccys_name'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountresoub050_name'), '/default/appysfuncb7f6')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccounts_storageaccountresoub050_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountresoub050_name'))]"
+            ],
+            "properties": {
+                "shareQuota": 5120
             }
         }
     ]
